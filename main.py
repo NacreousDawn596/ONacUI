@@ -31,7 +31,7 @@ def index():
 @app.route("/chat/<path:model>")
 def chat(model):
     conversation.clear()
-    return flask.send_file("chat.html")
+    return flask.render_template("chat.html", model=model)
 
 @app.route("/generate", methods=['POST'])
 def generate():
@@ -46,10 +46,16 @@ def generate():
         if response.status_code == 200:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
-                    chunk_str = chunk.decode('utf-8')
-                    message.append(json.loads(chunk_str)['response'])
-                    print(json.loads(chunk_str)['response'])
-                    yield f"{chunk_str}"
+                    try:
+                        chunk_str = chunk.decode('utf-8')
+                        message.append(json.loads(chunk_str)['response'])
+                        print(json.loads(chunk_str)['response'])
+                        yield f"{chunk_str}"
+                    except:
+                        chunk_str = chunk.decode('utf-8')
+                        message.append(json.loads(chunk_str)['response'])
+                        print(json.loads(chunk_str)['response'])
+                        yield f"{chunk_str}"
         else:
             yield "event: error\n"
             yield f"data: {json.dumps({'error': f'Error from external server: {response.status_code}'})}\n\n"
@@ -58,4 +64,4 @@ def generate():
         conversation.append({"role": "assistant", "content": ' '.join(message)})
     return flask.Response(generate_response(data), content_type="text/event-stream")
 
-app.run()
+app.run(port=80, host="192.168.8.129")

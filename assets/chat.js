@@ -15,6 +15,16 @@ async function receive(response) {
     const decoder = new TextDecoder();
 
     document.getElementsByClassName("AI")[0].innerHTML = document.getElementsByClassName("AI")[0].innerHTML.replace("...", "");
+
+    const insertLetter = async (letter) => {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                document.getElementsByClassName("AI")[0].insertBefore(document.createTextNode(letter), document.getElementsByClassName("AI")[0].querySelector('.blinking'));
+                resolve();
+            }, Math.random() * 1000);
+        });
+    };
+
     while (true) {
         const { done, value } = await reader.read();
 
@@ -23,8 +33,10 @@ async function receive(response) {
         }
 
         const message = JSON.parse(decoder.decode(value)).response;
-        document.getElementsByClassName("AI")[0].insertBefore(document.createTextNode(message), document.getElementsByClassName("AI")[0].querySelector('.blinking'));
 
+        for (const letter of message) {
+            await insertLetter(letter);
+        }
     }
 }
 
