@@ -58,4 +58,4 @@ def generate():
         conversation.append({"role": "assistant", "content": ' '.join(message)})
     return flask.Response(generate_response(data), content_type="text/event-stream")
 
-app.run(host="192.168.8.129", port=80)
+app.run()
