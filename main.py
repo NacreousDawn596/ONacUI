@@ -5,15 +5,15 @@ app = flask.Flask(__name__, template_folder="./")
 conversation = []
 
 data = {
-    'top_k': 20,
+    'top_k': 12,
     'top_p': 0.9,
-    'temperature': 0.8,
+    'temperature': 0.6,
     'repeat_penalty': 1.2,
     'presence_penalty': 1.5,
     'frequency_penalty': 1.0,
     "use_mmap": True,
-    'use_mlock': False,
-    'embedding_only': False,
+    'use_mlock': True,
+    'embedding_only': True,
     'rope_frequency_base': 1.1,
     'rope_frequency_scale': 0.8,
 }
@@ -46,16 +46,11 @@ def generate():
         if response.status_code == 200:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
-                    try:
-                        chunk_str = chunk.decode('utf-8')
-                        message.append(json.loads(chunk_str)['response'])
-                        print(json.loads(chunk_str)['response'])
-                        yield f"{chunk_str}"
-                    except:
-                        chunk_str = chunk.decode('utf-8')
-                        message.append(json.loads(chunk_str)['response'])
-                        print(json.loads(chunk_str)['response'])
-                        yield f"{chunk_str}"
+                    chunk_str = chunk.decode('utf-8')
+                    print(chunk_str)
+                    message.append(json.loads(chunk_str)['response'])
+                    print(json.loads(chunk_str)['response'])
+                    yield f"{chunk_str}"
         else:
             yield "event: error\n"
             yield f"data: {json.dumps({'error': f'Error from external server: {response.status_code}'})}\n\n"
